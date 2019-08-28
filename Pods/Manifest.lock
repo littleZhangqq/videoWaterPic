@@ -1,0 +1,26 @@
+PODS:
+  - GPUImage (0.1.7)
+  - Masonry (0.6.4)
+  - SDWebImage (3.7.6):
+    - SDWebImage/Core (= 3.7.6)
+  - SDWebImage/Core (3.7.6)
+
+DEPENDENCIES:
+  - GPUImage (~> 0.1.7)
+  - Masonry (~> 0.6.1)
+  - SDWebImage (~> 3.7.5)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - GPUImage
+    - Masonry
+    - SDWebImage
+
+SPEC CHECKSUMS:
+  GPUImage: 733a5f0fab92df9de1c37ba9df520a833ccb406d
+  Masonry: 281802d04d787ea2973179ee8bcb50500579ede2
+  SDWebImage: c325cf02c30337336b95beff20a13df489ec0ec9
+
+PODFILE CHECKSUM: 5ef5da273cbba95f777daad5ae16e8c53a3fdd55
+
+COCOAPODS: 1.7.5
