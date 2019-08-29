@@ -9,6 +9,7 @@
 #import "MovieViewController.h"
 #import "GPUImage.h"
 #import "Masonry.h"
+#import "CameraButton.h"
 
 #define screenHeight [UIScreen mainScreen].bounds.size.height
 #define screenWidth [UIScreen mainScreen].bounds.size.width
@@ -22,9 +23,9 @@
 @property(nonatomic, strong) GPUImageOutput<GPUImageInput> *filter;
 @property(nonatomic, strong) GPUImageMovieWriter *movieWriter;
 @property(nonatomic, strong) GPUImageView *filterView;
-@property(nonatomic, strong) GPUImageCropFilter * cropFliter;
 @property(nonatomic, strong) NSURL * currentMovieURL;
 @property(nonatomic, unsafe_unretained) BOOL currentVideoType;
+@property (nonatomic, retain) CameraButton * cameraPlayButton;
 
 @end
 
@@ -43,13 +44,12 @@
     _videoCamera.horizontallyMirrorRearFacingCamera = NO;
     
     
-    GPUImageView *backView = [[GPUImageView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight)];
-    [self.view addSubview:backView];
+    _filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight)];
+    _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
+    [self.view addSubview:_filterView];
     
     _filter = [[GPUImageSepiaFilter alloc] init];
     [(GPUImageSepiaFilter *)_filter setIntensity:0];
-    _filterView = (GPUImageView *)backView;
-    _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
     
     _brightFilter = [[GPUImageBrightnessFilter alloc] init];
     _brightFilter.brightness = 0.0f;
@@ -107,9 +107,75 @@
     }];
 }
 
+- (void)initViews{
+    [self.view addSubview:self.cameraPlayButton];
+}
+
+- (CameraButton *)cameraPlayButton
+{
+    if (_cameraPlayButton == nil) {
+        CGSize screenSize = [UIScreen mainScreen].bounds.size;
+        _cameraPlayButton = [[CameraButton alloc] initWithFrame:CGRectMake((screenSize.width - 80)/2, screenSize.height - 80 - 80, 80, 80)];
+        [_cameraPlayButton setType:CameraButtonTypeVideo];
+        __weak typeof(self) weakSelf = self;
+        [_cameraPlayButton setClickedBlock:^(CameraButton *button) {
+            [weakSelf takePhotoClick:button];
+        }];
+    }
+    return _cameraPlayButton;
+}
+
+-(void)takePhotoClick:(CameraButton *)sender{
+    if (_currentVideoType == NO) {
+        NSLog(@"开始拍摄");
+        _currentVideoType = YES;
+        NSString *fileName = [NSString stringWithFormat:@"video_%ld",time(NULL)];
+        NSString *pathToMovie = [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/Movie_%@.mp4",fileName]];
+        unlink([pathToMovie UTF8String]);
+        NSURL * movieURL = [NSURL fileURLWithPath:pathToMovie];
+        _currentMovieURL = movieURL;
+        _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(540, 960)];
+        _movieWriter.encodingLiveVideo = YES;
+        _movieWriter.shouldPassthroughAudio = YES;//是否使用源音源
+        _videoCamera.audioEncodingTarget = _movieWriter;//加入声音
+        [_blendFliter addTarget:_movieWriter];
+        double delayToStartRecording = 0.1;
+        __weak typeof(self) weakSelf = self;
+        dispatch_time_t startTime = dispatch_time(DISPATCH_TIME_NOW, delayToStartRecording * NSEC_PER_SEC);
+        dispatch_after(startTime, dispatch_get_main_queue(), ^(void){
+            [weakSelf.movieWriter startRecording];
+        });
+    }else {
+        _currentVideoType = NO;
+        [self stopVideoCamera:_currentMovieURL];
+    }
+}
+
+- (void)stopVideoCamera:(NSURL *)movieURL {
+    [_filter removeTarget:_movieWriter];
+    _videoCamera.audioEncodingTarget = nil;
+    [_movieWriter finishRecording];
+    UISaveVideoAtPathToSavedPhotosAlbum(movieURL.path, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
+}
+
+
+- (BOOL)checkCameraPermission{
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    if (authStatus == AVAuthorizationStatusDenied) {
+        NSLog(@"请打开相机权限");
+        return NO;
+    }
+    return YES;
+}
+
+- (void)video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo: (void *)contextInfo {
+    NSLog(@"保存完成");
+    NSLog(@"%@",videoPath);
+}
+
+#pragma mark 部分通用方法
 -(NSArray *)imagesWithGif:(NSString *)gifNameInBoundle {
     NSURL *fileUrl = [[NSBundle mainBundle] URLForResource:gifNameInBoundle withExtension:@"gif"];
-    
     CGImageSourceRef gifSource = CGImageSourceCreateWithURL((CFURLRef)fileUrl, NULL);
     size_t gifCount = CGImageSourceGetCount(gifSource);
     NSMutableArray *frames = [[NSMutableArray alloc]init];
@@ -182,75 +248,5 @@
     
     return duration;
 }
-
-- (void)initViews{
-    UIButton *takephoto = [UIButton buttonWithType:0];
-    takephoto.backgroundColor = [UIColor whiteColor];
-    takephoto.layer.borderColor = [UIColor colorWithRed:210 green:210 blue:210 alpha:1].CGColor;
-    takephoto.layer.borderWidth = 8;
-    takephoto.layer.masksToBounds = YES;
-    takephoto.layer.cornerRadius = 30;
-    [self.view addSubview:takephoto];
-    
-    [takephoto mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.mas_equalTo(self.view);
-        make.bottom.mas_equalTo(self.view.mas_bottom).offset(-80);
-        make.size.mas_equalTo(CGSizeMake(60, 60));
-    }];
-    
-    [takephoto addTarget:self action:@selector(takePhotoClick:) forControlEvents:UIControlEventTouchUpInside];
-}
-
--(void)takePhotoClick:(UIButton *)sender{
-    if (_currentVideoType == NO) {
-        NSLog(@"开始拍摄");
-        _currentVideoType = YES;
-        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-        NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"HHmmss"];
-        NSDate * NowDate = [NSDate dateWithTimeIntervalSince1970:now];
-        NSString * timeStr = [formatter stringFromDate:NowDate];
-        NSString *fileName = [NSString stringWithFormat:@"video_%@",timeStr];
-        NSString *pathToMovie = [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/Movie_%@.mp4",fileName]];
-        unlink([pathToMovie UTF8String]);
-        NSURL * movieURL = [NSURL fileURLWithPath:pathToMovie];
-        _currentMovieURL = movieURL;
-        _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(540, 960)];
-        _movieWriter.encodingLiveVideo = YES;
-        [_blendFliter addTarget:_movieWriter];
-        double delayToStartRecording = 0.1;
-        dispatch_time_t startTime = dispatch_time(DISPATCH_TIME_NOW, delayToStartRecording * NSEC_PER_SEC);
-        dispatch_after(startTime, dispatch_get_main_queue(), ^(void){
-            [_movieWriter startRecording];
-        });
-    }
-    else {
-        _currentVideoType = NO;
-        [self stopVideoCamera:_currentMovieURL];
-    }
-}
-
-- (void)stopVideoCamera:(NSURL *)movieURL {
-    [_filter removeTarget:_movieWriter];
-    _videoCamera.audioEncodingTarget = nil;
-    [_movieWriter finishRecording];
-    UISaveVideoAtPathToSavedPhotosAlbum(movieURL.path, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
-}
-
-
-- (BOOL)checkCameraPermission{
-    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    if (authStatus == AVAuthorizationStatusDenied) {
-        NSLog(@"请打开相机权限");
-        return NO;
-    }
-    return YES;
-}
-
-- (void)video:(NSString *)videoPath didFinishSavingWithError:(NSError *)error contextInfo: (void *)contextInfo {
-    NSLog(@"保存完成");
-    NSLog(@"%@",videoPath);
-}
-
 
 @end

@@ -9,8 +9,11 @@
 #import "ViewController.h"
 #import "Masonry.h"
 #import "MovieViewController.h"
+#import "LocalMovieViewController.h"
 
 @interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
+
+@property(nonatomic, strong) NSArray *arr;
 
 @end
 
@@ -18,6 +21,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+     self.arr = @[@"gif水印(拍摄)",@"镂空图片水印(拍摄)",@"多个图片水印(拍摄)",@"gif水印(本地选取)",@"镂空图片水印(本地选取)",@"多个图片水印(本地选取)"];
     self.view.backgroundColor = [UIColor whiteColor];
     UITableView *table = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStylePlain];
     table.delegate = self;
@@ -31,7 +35,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 3;
+    return self.arr.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -40,16 +44,22 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
-    NSArray *arr = @[@"gif水印",@"镂空图片水印",@"多个图片水印"];
-    cell.textLabel.text = arr[indexPath.row];
+    cell.textLabel.text = self.arr[indexPath.row];
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    MovieViewController *movie = [MovieViewController new];
-    movie.picType = indexPath.row;
-    [self presentViewController:movie animated:YES completion:nil];
+    if (indexPath.row < 3) {
+        MovieViewController *movie = [MovieViewController new];
+        movie.picType = indexPath.row;
+        [self presentViewController:movie animated:YES completion:nil];
+    }else{
+        LocalMovieViewController *local = [LocalMovieViewController new];
+        local.picType = indexPath.row -3;
+        [self presentViewController:local animated:YES completion:nil];
+    }
+    
 }
 
 
