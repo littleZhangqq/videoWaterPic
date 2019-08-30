@@ -17,6 +17,7 @@
 		84505CD023164E61009DA91C /* 002fig.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84505CCF23164E61009DA91C /* 002fig.gif */; };
 		84505CDE23175FB9009DA91C /* CameraButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 84505CDD23175FB9009DA91C /* CameraButton.m */; };
 		84505CE723176B2E009DA91C /* LocalMovieViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84505CE623176B2E009DA91C /* LocalMovieViewController.m */; };
+		84D5821F2318B54A00D9A5C2 /* FilterEffectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D5821E2318B54A00D9A5C2 /* FilterEffectViewController.m */; };
 		D6C420BC5B61F77663FECD6B /* libPods-MovieWaterPic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3279FE332888057A1BBB3F4D /* libPods-MovieWaterPic.a */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,8 @@
 		84505CDD23175FB9009DA91C /* CameraButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraButton.m; sourceTree = "<group>"; };
 		84505CE523176B2E009DA91C /* LocalMovieViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalMovieViewController.h; sourceTree = "<group>"; };
 		84505CE623176B2E009DA91C /* LocalMovieViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalMovieViewController.m; sourceTree = "<group>"; };
+		84D5821D2318B54A00D9A5C2 /* FilterEffectViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilterEffectViewController.h; sourceTree = "<group>"; };
+		84D5821E2318B54A00D9A5C2 /* FilterEffectViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FilterEffectViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +87,8 @@
 				84505CCD23164C1C009DA91C /* MovieViewController.m */,
 				84505CE523176B2E009DA91C /* LocalMovieViewController.h */,
 				84505CE623176B2E009DA91C /* LocalMovieViewController.m */,
+				84D5821D2318B54A00D9A5C2 /* FilterEffectViewController.h */,
+				84D5821E2318B54A00D9A5C2 /* FilterEffectViewController.m */,
 				84505CDC23175FB9009DA91C /* CameraButton.h */,
 				84505CDD23175FB9009DA91C /* CameraButton.m */,
 				84505CBC23164A62009DA91C /* Main.storyboard */,
@@ -231,6 +236,7 @@
 				84505CBB23164A62009DA91C /* ViewController.m in Sources */,
 				84505CC623164A63009DA91C /* main.m in Sources */,
 				84505CDE23175FB9009DA91C /* CameraButton.m in Sources */,
+				84D5821F2318B54A00D9A5C2 /* FilterEffectViewController.m in Sources */,
 				84505CB823164A62009DA91C /* AppDelegate.m in Sources */,
 				84505CCE23164C1C009DA91C /* MovieViewController.m in Sources */,
 				84505CE723176B2E009DA91C /* LocalMovieViewController.m in Sources */,

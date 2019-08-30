@@ -18,6 +18,7 @@ typedef enum: NSUInteger{
 
 @interface MovieViewController : UIViewController
 
+//拍摄视频添加水印
 @property(nonatomic, unsafe_unretained) AddMovieWaterPicType picType;
 
 @end

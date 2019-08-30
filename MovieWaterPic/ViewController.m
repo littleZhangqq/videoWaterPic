@@ -21,7 +21,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-     self.arr = @[@"gif水印(拍摄)",@"镂空图片水印(拍摄)",@"多个图片水印(拍摄)",@"gif水印(本地选取)",@"镂空图片水印(本地选取)",@"多个图片水印(本地选取)"];
+     self.arr = @[@"gif水印(拍摄)",@"镂空图片水印(拍摄)",@"多个图片水印(拍摄)",@"gif水印(本地选取)",@"镂空图片水印(本地选取)",@"多个图片水印(本地选取)",@"GPUimage的各种滤镜效果"];
     self.view.backgroundColor = [UIColor whiteColor];
     UITableView *table = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStylePlain];
     table.delegate = self;
@@ -54,12 +54,13 @@
         MovieViewController *movie = [MovieViewController new];
         movie.picType = indexPath.row;
         [self presentViewController:movie animated:YES completion:nil];
-    }else{
+    }else if(indexPath.row < 6){
         LocalMovieViewController *local = [LocalMovieViewController new];
         local.picType = indexPath.row -3;
         [self presentViewController:local animated:YES completion:nil];
+    }else{
+        [self presentViewController:[NSClassFromString(@"FilterEffectViewController") new] animated:YES completion:nil];
     }
-    
 }
 
 

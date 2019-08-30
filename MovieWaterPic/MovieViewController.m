@@ -38,14 +38,14 @@
 }
 
 -(void)initCamera{
-    _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionBack];
+    _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionFront];
     _videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
     _videoCamera.horizontallyMirrorFrontFacingCamera = YES;
     _videoCamera.horizontallyMirrorRearFacingCamera = NO;
     
     
     _filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight)];
-    _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
+    _filterView.fillMode = kGPUImageFillModePreserveAspectRatio;
     [self.view addSubview:_filterView];
     
     _filter = [[GPUImageSepiaFilter alloc] init];
@@ -134,7 +134,7 @@
         unlink([pathToMovie UTF8String]);
         NSURL * movieURL = [NSURL fileURLWithPath:pathToMovie];
         _currentMovieURL = movieURL;
-        _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(540, 960)];
+        _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:CGSizeMake(720, 1280)];
         _movieWriter.encodingLiveVideo = YES;
         _movieWriter.shouldPassthroughAudio = YES;//是否使用源音源
         _videoCamera.audioEncodingTarget = _movieWriter;//加入声音
@@ -158,7 +158,6 @@
     UISaveVideoAtPathToSavedPhotosAlbum(movieURL.path, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
 }
 
-
 - (BOOL)checkCameraPermission{
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     if (authStatus == AVAuthorizationStatusDenied) {
@@ -174,6 +173,7 @@
 }
 
 #pragma mark 部分通用方法
+//取出gif图的每帧图片放入数组
 -(NSArray *)imagesWithGif:(NSString *)gifNameInBoundle {
     NSURL *fileUrl = [[NSBundle mainBundle] URLForResource:gifNameInBoundle withExtension:@"gif"];
     CGImageSourceRef gifSource = CGImageSourceCreateWithURL((CFURLRef)fileUrl, NULL);
@@ -188,6 +188,7 @@
     return frames;
 }
 
+//GIF图的完整运行时间
 - (NSTimeInterval)durationForGifData:(NSData *)data{
     //将GIF图片转换成对应的图片源
     CGImageSourceRef gifSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);

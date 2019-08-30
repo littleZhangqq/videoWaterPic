@@ -16,6 +16,7 @@ typedef enum: NSUInteger{
     LocalMovieWaterPicTypeManyPic
 }LocalMovieWaterPicType;
 
+////本地选取视频添加水印
 @interface LocalMovieViewController : UIViewController
 
 @property(nonatomic, unsafe_unretained) LocalMovieWaterPicType picType;

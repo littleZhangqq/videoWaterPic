@@ -110,6 +110,9 @@
     
     [_writer startRecording];
     [_imageMovie startProcessing];
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    
     //渲染
     [progressFilter setFrameProcessingCompletionBlock:^(GPUImageOutput *output, CMTime time) {
         if (self.picType == LocalMovieWaterPicTypeGif) {
