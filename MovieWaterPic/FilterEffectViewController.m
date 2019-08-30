@@ -37,12 +37,12 @@
     UIScrollView *scv = [[UIScrollView alloc] init];
     scv.alwaysBounceHorizontal = YES;
     scv.showsHorizontalScrollIndicator = NO;
-    scv.backgroundColor = [UIColor cyanColor];
+    scv.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:scv];
     
     [scv mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.bottom.mas_equalTo(self.view);
-        make.height.mas_equalTo(150);
+        make.height.mas_equalTo(100);
     }];
     
     UIView *contain = [UIView new];
@@ -69,13 +69,14 @@
         UIImageView *imv = [[UIImageView alloc] init];
         imv.backgroundColor = [UIColor purpleColor];
         imv.layer.cornerRadius = 30;
+        imv.tag = 1100+i;
         imv.layer.masksToBounds = YES;
         [btn addSubview:imv];
         
         [imv mas_makeConstraints:^(MASConstraintMaker *make) {
             make.size.mas_equalTo(CGSizeMake(60, 60));
             make.centerX.mas_equalTo(btn);
-            make.top.mas_equalTo(20);
+            make.top.mas_equalTo(10);
         }];
         
         UILabel *text = [[UILabel alloc] init];
@@ -86,7 +87,7 @@
         
         [text mas_makeConstraints:^(MASConstraintMaker *make) {
             make.centerX.mas_equalTo(btn);
-            make.top.mas_equalTo(imv.mas_bottom).offset(15);
+            make.top.mas_equalTo(imv.mas_bottom).offset(10);
         }];
         
         lastButton = btn;
@@ -104,6 +105,11 @@
         if (i != sender.tag-1000) {
             btn.selected = NO;
         }
+        UIImageView *imv = (UIImageView *)[self.view viewWithTag:1100+i];
+        imv.backgroundColor = [UIColor purpleColor];
+        if (i == sender.tag - 1000) {
+            imv.backgroundColor = [UIColor greenColor];
+        }
     }
     self.type = sender.tag - 1000;
 }
@@ -112,7 +118,6 @@
     if (_type == type) {
         return;
     }
-    
     _type = type;
     switch (_type) {
         case GaussiBlurt:
@@ -166,6 +171,7 @@
         default:
             break;
     }
+    NSLog(@"当前选择滤镜%@",_filterArray[_type]);
     [_writer finishRecording];
     [_filter removeTarget:_writer];
     [self initCamera];
@@ -174,7 +180,7 @@
 -(void)initCamera{
     [self.camera addTarget:self.filter];
     
-    _filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight-150)];
+    _filterView = [[GPUImageView alloc] initWithFrame:CGRectMake(0, 0, screenWidth, screenHeight-100)];
     _filterView.fillMode = kGPUImageFillModePreserveAspectRatioAndFill;
     [self.view addSubview:_filterView];
     [self.filter addTarget:_filterView];
@@ -199,7 +205,7 @@
 
 - (GPUImageVideoCamera *)camera{
     if (!_camera) {
-        _camera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionFront];
+        _camera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionBack];
         _camera.outputImageOrientation = UIInterfaceOrientationPortrait;
         _camera.horizontallyMirrorFrontFacingCamera = YES;
         _camera.horizontallyMirrorRearFacingCamera = NO;
